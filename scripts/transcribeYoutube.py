@@ -14,7 +14,7 @@ import api
 
 
 class YoutubeTranscriber:
-    '''Short description'''
+    '''YoutubeTranscriber class'''
 
     def __init__(self, vidId, shouldPrint=False):
         '''Short description\n
@@ -24,7 +24,6 @@ class YoutubeTranscriber:
             [int] 0 for pass
         Notes:
             notes here'''
-        #internal automatically called init code here
         self.vidId = vidId
         self.shouldPrint = shouldPrint
 
@@ -46,7 +45,6 @@ class YoutubeTranscriber:
 
 
 if __name__ == '__main__':
-
     cl.green("Program Start")
     URL = "https://www.youtube.com/@TimcastNews"
     page = requests.get(URL)

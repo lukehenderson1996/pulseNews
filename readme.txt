@@ -7,9 +7,15 @@ Luke Henderson
 
 
 installation instructions:
+#main.py:
 pip install openai
+#transcribeYoutube.py:
 pip install youtube-transcript-api
 pip install beautifulsoup4
+#webDriver.py:
+pip install selenium
+pip install webdriver_manager
+pip install xmltodict
 
 
 openai API resources
