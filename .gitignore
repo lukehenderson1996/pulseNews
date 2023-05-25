@@ -1,0 +1,18 @@
+#Python
+*.pyc
+__pycache__
+
+#datalogs
+*.xls
+*.xlsx
+*.csv
+*.xml
+
+#reference
+reference/*
+
+#git created sometimes
+*.orig
+
+#misc
+*apiKeys.py
