@@ -1,39 +1,46 @@
 """Youtube transcriptions"""
 
-# Author: Luke Henderson
+# Authors: Luke Henderson and Dawson Fields 
 __version__ = '0.1'
 
 import os
-import youtube-transcript-api
+from youtube_transcript_api import YouTubeTranscriptApi
 
 import colors as cl
 import debugTools as dt
 
-class NAME: #or, ClassName
-    """Short description"""
-    internalConstant = 2e-6
 
-    def __init__(self, arg1, arg2, optionalArg3='normal'):
+
+class YoutubeTranscriber:
+    """Short description"""
+
+    def __init__(self, vidId, shouldPrint=False):
         """Short description\n
         Args:
             arg1 [str]: description\n
-            arg2 [float]: description\n
-            optionalArg3 [str, optional]: 
-                long description------------------------
         Return:
             [int] 0 for pass
         Notes:
             notes here"""
         #internal automatically called init code here
-        self.internalVariable = 'variable content'
-        pass
+        self.vidId = vidId
+        self.shouldPrint = shouldPrint
 
-    def init(self):
-        """non-automatic init"""
-        pass
+    def run(self):
+        resp = YouTubeTranscriptApi.get_transcript(self.vidId)
 
-    def _internalFunction(self, arg1):
-        pass
+        # dt.info(resp, 'resp')
 
-    def publicFunction(self, arg1, arg2) -> float:
-        return 2.3
+        allText = ''
+        for item in resp:
+            allText = allText + item['text'].replace('\n', ' ')
+
+        if self.shouldPrint: 
+            dt.info(allText, 'allText')
+            dt.info(len(allText.split(' ')), 'test')
+
+        return allText
+
+
+if __name__ == '__main__':
+    pass

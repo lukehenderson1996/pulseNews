@@ -1,24 +1,26 @@
 """pulseNews"""
 
-# Author: Luke Henderson 
+# Authors: Luke Henderson and Dawson Fields 
 __version__ = '0.1'
 
 import time
 import os
 import sys
 import openai
-import ast
 
 import apiKeys
 import colors as cl
 import debugTools as dt
 import api
+import transcribeYoutube as tranYt
 
 
 #constants:
 #https://openai.com/pricing
 MODEL_PRICES = {'text-davinci-003': 0.02, 'text-curie-001': 0.002, 'text-babbage-001': 0.0005, 'text-ada-001': 0.0004,
                 'gpt-3.5-turbo': 0.002} #$/1k tokens
+TOKEN_MAXES = {'text-davinci-003': 0, 'text-curie-001': 0, 'text-babbage-001': 0, 'text-ada-001': 0,
+                'gpt-3.5-turbo': 0} #????? need to find info per model
 SIMULATE_COMPLETIONS = True #simulate openAI paid API calls
 
 def checkFinish(resp):
@@ -57,19 +59,92 @@ if SIMULATE_COMPLETIONS:
     cl.yellow('Using simulated completions')
 else:
     input(f'{cl.WARNING}Warning: main.py using paid API calls. Press enter to continue...{cl.ENDC}')
-
-
+#init youtube transcriber
+ytTranscriber = tranYt.YoutubeTranscriber('88kd9tVwkH8', shouldPrint=False)
 
 
 
 
 #------------------------------------------------------------main loop------------------------------------------------------------
-# #list models available
-# openListResp = openai.Model.list()
-# # dt.info(openListResp)
-# modelList = openListResp['data']
-# for model in modelList:
-#     print(model['id'])
+
+
+videoText = ytTranscriber.run()
+model = "gpt-3.5-turbo"
+prompt = ''
+if SIMULATE_COMPLETIONS:
+    compResp = {
+        "id": "chatcmpl-7JwIDDHYhtwuySIlsIgik8nwjF41t",
+        "object": "chat.completion",
+        "created": 1684986665,
+        "model": "gpt-3.5-turbo-0301",
+        "usage": {
+            "prompt_tokens": 3106,
+            "completion_tokens": 98,
+            "total_tokens": 3204
+        },
+        "choices": [
+            {
+            "message": {
+                "role": "assistant",
+                "content": "- Smartphone cameras have evolved from simple sensors to complex computational systems that rely heavily on software.\n- Google's Pixel camera system has been successful due to its consistent use of the same sensor and software tuning combo.\n- Apple's iPhone 14 Pro's new 48-megapixel sensor has resulted in some overprocessed photos, but software updates are expected to improve this.\n- Skin tone representation is a significant factor in photo comparisons between smartphones, with Google's Real Tone technology being a standout feature."
+            },
+            "finish_reason": "stop",
+            "index": 0
+            }
+        ]
+    }
+
+    # print(compResp["choices"][0]["message"]["content"])
+else:
+    compResp = openai.ChatCompletion.create(
+        model=model, 
+        temperature=0, 
+        max_tokens=350, 
+        top_p=1,
+        messages=[
+            {"role": "system", "content": "You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than 4 bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point (no more than 4 bullet points) format in the voice of the original author. "},
+            {"role": "user", "content": videoText} 
+        ] 
+    )
+
+# dt.info(compResp, 'compResp')
+cost = costStr(compResp, model)
+cl.blue(f'\nResponse from {compResp["model"]}:\t\t' + cost)
+checkFinish(compResp)
+
+cl.blue('Response digested: ')
+cont = compResp['choices'][0]['message']['content']
+print(f'Content is: \n{cont}')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit()
+
+
+
+
+
+#list models available
+openListResp = openai.Model.list()
+# dt.info(openListResp)
+modelList = openListResp['data']
+for model in modelList:
+    print(model['id'])
 
 
 #pull latest tweets from account
