@@ -1,4 +1,4 @@
-"""Youtube transcriptions and rss information gathering tools"""
+'''Youtube transcriptions and rss information gathering tools'''
 
 # Authors: Luke Henderson and Dawson Fields 
 __version__ = '0.2'
@@ -14,16 +14,16 @@ import api
 
 
 class YoutubeTranscriber:
-    """Short description"""
+    '''Short description'''
 
     def __init__(self, vidId, shouldPrint=False):
-        """Short description\n
+        '''Short description\n
         Args:
             arg1 [str]: description\n
         Return:
             [int] 0 for pass
         Notes:
-            notes here"""
+            notes here'''
         #internal automatically called init code here
         self.vidId = vidId
         self.shouldPrint = shouldPrint

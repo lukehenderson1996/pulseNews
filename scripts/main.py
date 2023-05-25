@@ -1,4 +1,4 @@
-"""pulseNews"""
+'''pulseNews'''
 
 # Authors: Luke Henderson and Dawson Fields 
 __version__ = '0.3'
