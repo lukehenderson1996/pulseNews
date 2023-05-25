@@ -1,7 +1,7 @@
 """pulseNews"""
 
 # Authors: Luke Henderson and Dawson Fields 
-__version__ = '0.1'
+__version__ = '0.3'
 
 import time
 import os
@@ -60,16 +60,20 @@ if SIMULATE_COMPLETIONS:
 else:
     input(f'{cl.WARNING}Warning: main.py using paid API calls. Press enter to continue...{cl.ENDC}')
 #init youtube transcriber
-ytTranscriber = tranYt.YoutubeTranscriber('88kd9tVwkH8', shouldPrint=False)
+ytTranscriber = tranYt.YoutubeTranscriber('4Zsaj_9Zpjc', shouldPrint=False)
 
 
 
 
 #------------------------------------------------------------main loop------------------------------------------------------------
 
-
+#youtube transcription GET
+cl.blue(f'Getting transcription for video ID "{ytTranscriber.vidId}"')
 videoText = ytTranscriber.run()
+
+#openai summarization
 model = "gpt-3.5-turbo"
+cl.blue('Summarizing content using LLM "{model}"')
 prompt = ''
 if SIMULATE_COMPLETIONS:
     compResp = {

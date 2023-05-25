@@ -1,14 +1,16 @@
-"""Youtube transcriptions"""
+"""Youtube transcriptions and rss information gathering tools"""
 
 # Authors: Luke Henderson and Dawson Fields 
-__version__ = '0.1'
+__version__ = '0.2'
 
 import os
 from youtube_transcript_api import YouTubeTranscriptApi
+import requests
+from bs4 import BeautifulSoup
 
 import colors as cl
 import debugTools as dt
-
+import api
 
 
 class YoutubeTranscriber:
@@ -42,5 +44,17 @@ class YoutubeTranscriber:
         return allText
 
 
+
 if __name__ == '__main__':
-    pass
+
+    cl.green("Program Start")
+    URL = "https://www.youtube.com/@TimcastNews"
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+    # rssTitle = soup.find_All('div')
+    print(soup.title)
+    for a in soup.find_all('link', href=True):
+        print("Found the URL:", a['href'])
+    # dt.info(page.content)
+
+

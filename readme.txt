@@ -9,6 +9,7 @@ Luke Henderson
 installation instructions:
 pip install openai
 pip install youtube-transcript-api
+pip install beautifulsoup4
 
 
 openai API resources
