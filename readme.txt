@@ -8,6 +8,7 @@ Luke Henderson
 
 installation instructions:
 pip install openai
+pip install youtube-transcript-api
 
 
 openai API resources
