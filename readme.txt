@@ -2,7 +2,7 @@ Information and feed aggregator/gathering/analysis platform utilizing OpenAI's L
 
 Written by: 
 Luke Henderson
-
+Dawson Fields
 
 
 
@@ -16,6 +16,8 @@ pip install beautifulsoup4
 pip install selenium
 pip install webdriver_manager
 pip install xmltodict
+#twitter
+pip install twitter-scraper-selenium
 
 
 openai API resources
