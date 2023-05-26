@@ -7,17 +7,42 @@ Dawson Fields
 
 
 installation instructions:
+
 #main.py:
 pip install openai
+
 #transcribeYoutube.py:
 pip install youtube-transcript-api
 pip install beautifulsoup4
+
 #webDriver.py:
 pip install selenium
 pip install webdriver_manager
 pip install xmltodict
+
 #twitter
 pip install twitter-scraper-selenium
+
+#general
+Current programs use version 3.7.9 64 bit
+you will need pythonNotes in your PYTHONPATH: https://github.com/lukehenderson1996/pythonNotes
+Alternatively, the quick and dirty solution is to paste relevant pythonNotes scripts into pulseNews\scripts
+Windows PYTHONPATH instructions: 
+press windows key, type in "advanced", press enter
+should open system properties, advanced
+click Environmental Variables
+under User variables for [USERNAME]: 
+Add/modify variable "PYTHONPATH" to include:
+    (should already have Python37 stuff)
+    C:\path\to\your\scripts
+must restart cmd, but not entire computer
+
+#OpenAI API setup
+must create paid account and get private key from:
+https://platform.openai.com/
+see examples\example api-Keys.py for formatting of scripts\apiKeys.py (.gitignore setup to not track/upload this file)
+
+
 
 
 openai API resources

@@ -14,3 +14,6 @@ __pycache__
 
 #misc
 *apiKeys.py
+
+#config file
+scripts/config.py
