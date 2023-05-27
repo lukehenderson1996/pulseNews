@@ -25,7 +25,7 @@ import transcribeYoutube as tranYt
 MODEL_PRICES = {'text-davinci-003': 0.02, 'text-curie-001': 0.002, 'text-babbage-001': 0.0005, 'text-ada-001': 0.0004,
                 'gpt-3.5-turbo': 0.002} #$/1k tokens
 TOKEN_MAXES = {'text-davinci-003': 0, 'text-curie-001': 0, 'text-babbage-001': 0, 'text-ada-001': 0,
-                'gpt-3.5-turbo': 0} #????? need to find info per model
+                'gpt-3.5-turbo': 4097} #????? need to find info per model
 
 def checkFinish(resp):
     reason = resp["choices"][0]["finish_reason"]
@@ -51,7 +51,7 @@ cl.green('Program Start')
 
 #--------------------------------------------------------------init--------------------------------------------------------------
 #assert correct module versions 
-modV = {cfg:  '0.2',
+modV = {cfg:  '0.3',
         cl:   '0.8',
         api:  '0.5'}
 for module in modV:
@@ -79,14 +79,14 @@ else:
 #----------------------------------------------------ytTranscribe----------------------------------------------------
 if 'ytTranscribe' in cfg.jobs:
     #init youtube transcriber
-    ytTranscriber = tranYt.YoutubeTranscriber('4Zsaj_9Zpjc', shouldPrint=False)
+    ytTranscriber = tranYt.YoutubeTranscriber(cfg.vidId, shouldPrint=False)
     #youtube transcription GET
     cl.blue(f'Getting transcription for video ID "{ytTranscriber.vidId}"')
     videoText = ytTranscriber.run()
 
     #openai summarization
     model = "gpt-3.5-turbo"
-    cl.blue('Summarizing content using LLM "{model}"')
+    cl.blue(f'Summarizing content using LLM "{model}"')
     prompt = ''
     if cfg.simulateCompletions:
         compResp = {
@@ -113,6 +113,14 @@ if 'ytTranscribe' in cfg.jobs:
 
         # print(compResp["choices"][0]["message"]["content"])
     else:
+        wordCount = len(videoText.split(" "))
+        print(f'Word count: {wordCount}')
+        if wordCount > 2500:
+            videoTextLen = len(videoText)
+            abrigedLen = int((2500/wordCount)*videoTextLen)
+            videoText = videoText[:abrigedLen]
+            wordCount = len(videoText.split(" "))
+            cl.blue(f'Abridging video transcript for a new word count of {wordCount}')
         compResp = openai.ChatCompletion.create(
             model=model, 
             temperature=0, 
