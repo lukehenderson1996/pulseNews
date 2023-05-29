@@ -1,7 +1,7 @@
 '''pulseNews'''
 
 # Authors: Luke Henderson and Dawson Fields 
-__version__ = '0.4'
+__version__ = '0.5'
 
 import time
 import os
@@ -51,7 +51,7 @@ cl.green('Program Start')
 
 #--------------------------------------------------------------init--------------------------------------------------------------
 #assert correct module versions 
-modV = {cfg:  '0.3',
+modV = {cfg:  '0.4',
         cl:   '0.8',
         api:  '0.5'}
 for module in modV:
@@ -84,6 +84,7 @@ if 'ytTranscribe' in cfg.jobs:
     cl.blue(f'Getting transcription for video ID "{ytTranscriber.vidId}"')
     videoText = ytTranscriber.run()
 
+
     #openai summarization
     model = "gpt-3.5-turbo"
     cl.blue(f'Summarizing content using LLM "{model}"')
@@ -113,33 +114,74 @@ if 'ytTranscribe' in cfg.jobs:
 
         # print(compResp["choices"][0]["message"]["content"])
     else:
+        print('\n')
+        textJobs = []
+        wordCountList = []
         wordCount = len(videoText.split(" "))
-        print(f'Word count: {wordCount}')
-        if wordCount > 2500:
+        i = 0
+        runFlag = True
+        while runFlag:
             videoTextLen = len(videoText)
             abrigedLen = int((2500/wordCount)*videoTextLen)
-            videoText = videoText[:abrigedLen]
+            # print(f'is {len(videoText)} greater than {abrigedLen}?')
+            if len(videoText) > abrigedLen:
+                textJobs.append(videoText[:abrigedLen])
+                videoText = videoText[abrigedLen-2:]
+            else:
+                textJobs.append(videoText)
+                videoText = ''
+                runFlag = False
             wordCount = len(videoText.split(" "))
-            cl.blue(f'Abridging video transcript for a new word count of {wordCount}')
-        compResp = openai.ChatCompletion.create(
-            model=model, 
-            temperature=0, 
-            max_tokens=350, 
-            top_p=1,
-            messages=[
-                {"role": "system", "content": "You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than 4 bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point (no more than 4 bullet points) format in the voice of the original author. "},
-                {"role": "user", "content": videoText} 
-            ] 
-        )
+            wordCountList.append(wordCount)
+            # dt.info(textJobs, 'textJobs')
+            # cl.yellow(f'len of textJob[0] = {}')
+            wordCountThisJob = len(textJobs[i].split(" "))
 
-    # dt.info(compResp, 'compResp')
-    cost = costStr(compResp, model)
-    cl.blue(f'\nResponse from {compResp["model"]}:\t\t' + cost)
-    checkFinish(compResp)
+            i += 1
+            cl.blue(f'Job {i} created with word count of {wordCountThisJob}')
 
-    cl.blue('Response digested: ')
-    cont = compResp['choices'][0]['message']['content']
-    print(f'Content is: \n{cont}')
+        # #abridging version
+        # wordCount = len(videoText.split(" "))
+        # print(f'Word count: {wordCount}')
+        # if wordCount > 2500:
+        #     videoTextLen = len(videoText)
+        #     abrigedLen = int((2500/wordCount)*videoTextLen)
+        #     videoText = videoText[:abrigedLen]
+        #     wordCount = len(videoText.split(" "))
+        #     cl.blue(f'Abridging video transcript for a new word count of {wordCount}')
+
+        i = 0
+        for job in textJobs:
+            cl.blue(f'\nRunning job {i+1}...')
+            userInput = input("Press enter to continue, or type n to skip ")
+            if userInput == 'n':
+                cl.yellow('skipping...')
+                i += 1
+                continue
+
+            systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format in the voice of the original author. "
+            compResp = openai.ChatCompletion.create(
+                model=model, 
+                temperature=0, 
+                max_tokens=int(cfg.bulletPointNum*cfg.tokensPerbp), 
+                top_p=1,
+                messages=[
+                    {"role": "system", "content": systemMessage},
+                    {"role": "user", "content": job} 
+                ] 
+            )
+            # dt.info(compResp, 'compResp')
+            cost = costStr(compResp, model)
+            cl.blue(f'\nResponse from {compResp["model"]}:\t\t' + cost)
+            checkFinish(compResp)
+
+            cl.blue('Response digested: ')
+            cont = compResp['choices'][0]['message']['content']
+            print(f'Content is: \n{cont}')
+
+            i += 1
+
+    
 
 
 #----------------------------------------------------tweetAnalysis----------------------------------------------------

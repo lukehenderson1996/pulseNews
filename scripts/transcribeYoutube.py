@@ -1,7 +1,7 @@
 '''Youtube transcriptions and rss information gathering tools'''
 
 # Authors: Luke Henderson and Dawson Fields 
-__version__ = '0.2'
+__version__ = '0.21'
 
 import os
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -34,7 +34,7 @@ class YoutubeTranscriber:
 
         allText = ''
         for item in resp:
-            allText = allText + item['text'].replace('\n', ' ')
+            allText = allText + item['text'].replace('\n', ' ') + ' '
 
         if self.shouldPrint: 
             dt.info(allText, 'allText')
