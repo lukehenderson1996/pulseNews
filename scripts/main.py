@@ -159,7 +159,10 @@ if 'ytTranscribe' in cfg.jobs:
                 i += 1
                 continue
 
-            systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format in the voice of the original author. "
+            #system message #1: has a bug where sometimes the LLM will not summarize in bullet points
+            # systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format in the voice of the original author. "
+            #system message #2
+            systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format with the same intent as the original author. \n\n Example output:\n-First bullet point summarizing first bit of information\n-Second bullet point summarizing the second bit of information\n-Third bullet point summarizing the third bit of information\netc..."
             compResp = openai.ChatCompletion.create(
                 model=model, 
                 temperature=0, 
