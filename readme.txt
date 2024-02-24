@@ -11,6 +11,9 @@ installation instructions:
 #main.py:
 pip install openai
 
+#tgBot.py
+pip install telebot
+
 #transcribeYoutube.py:
 pip install youtube-transcript-api
 pip install beautifulsoup4

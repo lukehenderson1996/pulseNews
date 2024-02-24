@@ -17,3 +17,6 @@ __pycache__
 
 #config file
 scripts/config.py
+
+#misc folders
+office work/*

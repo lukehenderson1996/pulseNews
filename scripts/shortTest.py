@@ -9,6 +9,7 @@ from datetime import datetime
 import colors as cl
 import debugTools as dt
 import logger as lg
+import utils as ut
 
 cl.green('Program Start')
 progStart = time.time()
@@ -18,4 +19,5 @@ progStart = time.time()
 
 myStr = '1234567890abcde'
 
-print(myStr[:60])
+chatLogger = lg.LOGGER(['Time', 'Sender', 'Message'], 'chats/' , str(None), persistent=True)
+chatLogger.simpLog(['','',''])
