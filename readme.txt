@@ -4,6 +4,9 @@ Written by:
 Luke Henderson
 Dawson Fields
 
+**********NEED TO MIGRATE OPENAI CODE WITH LINUX***********
+https://github.com/openai/openai-python/discussions/742
+https://community.openai.com/t/how-to-migrate-openai-i-cannot-use-chatgpt-api/575437
 
 
 installation instructions:
@@ -17,6 +20,7 @@ pip install telebot
 #transcribeYoutube.py:
 pip install youtube-transcript-api
 pip install beautifulsoup4
+pip install xmltodict
 
 #webDriver.py:
 pip install selenium
