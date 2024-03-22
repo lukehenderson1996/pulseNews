@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 from autogpt.config import Config
 from autogpt.llm.modelsinfo import COSTS
@@ -43,22 +45,18 @@ class ApiManager(metaclass=Singleton):
         if temperature is None:
             temperature = cfg.temperature
         if deployment_id is not None:
-            response = openai.ChatCompletion.create(
-                deployment_id=deployment_id,
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                api_key=cfg.openai_api_key,
-            )
+            response = client.chat.completions.create(deployment_id=deployment_id,
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=cfg.openai_api_key)
         else:
-            response = openai.ChatCompletion.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                api_key=cfg.openai_api_key,
-            )
+            response = client.chat.completions.create(model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=cfg.openai_api_key)
         logger.debug(f"Response: {response}")
         prompt_tokens = response.usage.prompt_tokens
         completion_tokens = response.usage.completion_tokens

@@ -6,7 +6,9 @@ from itertools import islice
 from typing import List, Optional
 
 import numpy as np
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 import tiktoken
 from colorama import Fore, Style
 from openai.error import APIError, RateLimitError, Timeout
@@ -272,18 +274,16 @@ def create_embedding(
         tokenizer_name=cfg.embedding_tokenizer,
         chunk_length=cfg.embedding_token_limit,
     ):
-        embedding = openai.Embedding.create(
-            input=[chunk],
-            api_key=cfg.openai_api_key,
-            **kwargs,
-        )
+        embedding = client.embeddings.create(input=[chunk],
+        api_key=cfg.openai_api_key,
+        **kwargs)
         api_manager = ApiManager()
         api_manager.update_cost(
             prompt_tokens=embedding.usage.prompt_tokens,
             completion_tokens=0,
             model=cfg.embedding_model,
         )
-        chunk_embeddings.append(embedding["data"][0]["embedding"])
+        chunk_embeddings.append(embedding.data[0].embedding)
         chunk_lengths.append(len(chunk))
 
     # do weighted avg

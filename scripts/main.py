@@ -6,7 +6,9 @@ __version__ = '0.5'
 import time
 import os
 import sys
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=apiKeys.openaiPriv)
 import ast
 import xmltodict
 
@@ -58,7 +60,6 @@ for module in modV:
     errMsg = f'Expecting version {modV[module]} of "{os.path.basename(module.__file__)}". Imported {module.__version__}'
     assert module.__version__ == modV[module], errMsg
 #init openai
-openai.api_key = apiKeys.openaiPriv
 #warn if using paid API calls
 if cfg.simulateCompletions:
     cl.yellow('Using simulated completions')
@@ -163,23 +164,21 @@ if 'ytTranscribe' in cfg.jobs:
             # systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format in the voice of the original author. "
             #system message #2
             systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.bulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format with the same intent as the original author. \n\n Example output:\n-First bullet point summarizing first bit of information\n-Second bullet point summarizing the second bit of information\n-Third bullet point summarizing the third bit of information\netc..."
-            compResp = openai.ChatCompletion.create(
-                model=model, 
-                temperature=0, 
-                max_tokens=int(cfg.bulletPointNum*cfg.tokensPerbp), 
-                top_p=1,
-                messages=[
-                    {"role": "system", "content": systemMessage},
-                    {"role": "user", "content": job} 
-                ] 
-            )
+            compResp = client.chat.completions.create(model=model, 
+            temperature=0, 
+            max_tokens=int(cfg.bulletPointNum*cfg.tokensPerbp), 
+            top_p=1,
+            messages=[
+                {"role": "system", "content": systemMessage},
+                {"role": "user", "content": job} 
+            ])
             # dt.info(compResp, 'compResp')
             cost = costStr(compResp, model)
-            cl.blue(f'\nResponse from {compResp["model"]}:\t\t' + cost)
+            cl.blue(f'\nResponse from {compResp.model}:\t\t' + cost)
             checkFinish(compResp)
 
             cl.blue('Response digested: ')
-            cont = compResp['choices'][0]['message']['content']
+            cont = compResp.choices[0].message.content
             print(f'Content is: \n{cont}')
 
             i += 1
@@ -211,17 +210,17 @@ if 'tweetAnalysis' in cfg.jobs:
     if cfg.simulateCompletions:
         compResp = {'id': 'cmpl-7GIqPtDF3cFJVvTaFkBTPP8o7izcV', 'object': 'text_completion', 'created': 1684120041, 'model': 'text-davinci-003', 'choices': [{'text': "'tweet 1': 3, 'tweet 2': 6, 'tweet 3': 4,  'tweet 4': 1, 'tweet 5': 10", 'index': 0, 'logprobs': None, 'finish_reason': 'stop'}], 'usage': {'prompt_tokens': 360, 'completion_tokens': 35, 'total_tokens': 395}}
     else:
-        compResp = openai.Completion.create(model=model, prompt=prompt, temperature=0, max_tokens=100,
+        compResp = client.completions.create(model=model, prompt=prompt, temperature=0, max_tokens=100,
             top_p=1, frequency_penalty=0, presence_penalty=0, stop=["}"])
 
     # dt.info(compResp, 'compResp')
 
     cost = costStr(compResp, model)
-    cl.blue(f'\nResponse from {compResp["model"]}:\t\t' + cost)
+    cl.blue(f'\nResponse from {compResp.model}:\t\t' + cost)
     checkFinish(compResp)
     #convert response (with error detection)
     try:
-        impDict = ast.literal_eval('{' + compResp['choices'][0]['text'] + '}')
+        impDict = ast.literal_eval('{' + compResp.choices[0].text + '}')
         assert isinstance(impDict, dict)
         assert len(impDict)==5
         keyList = [str(key) for key in impDict.keys()]
@@ -255,7 +254,7 @@ if 'tweetAnalysis' in cfg.jobs:
         if cfg.simulateCompletions:
             sumList.append({'id': 'cmpl-7GKXMxBe5cxWeXjOzHliMp1W0KVIZ', 'object': 'text_completion', 'created': 1684126548, 'model': 'text-davinci-003', 'choices': [{'text': "Excess deaths in 0-24 age group; urgent call.", 'index': 0, 'logprobs': None, 'finish_reason': 'stop'}], 'usage': {'prompt_tokens': 56, 'completion_tokens': 14, 'total_tokens': 70}})
         else:
-            sumList.append(openai.Completion.create(model=model, prompt=prompt, temperature=1, max_tokens=25,
+            sumList.append(client.completions.create(model=model, prompt=prompt, temperature=1, max_tokens=25,
                 top_p=1, frequency_penalty=0, presence_penalty=0))
 
     cl.purple('\nTweet Analysis Report: \n')

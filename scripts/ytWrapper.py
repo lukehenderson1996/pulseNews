@@ -6,7 +6,9 @@ __version__ = '0.2'
 import time
 import os
 import sys
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=apiKeys.openaiPriv)
 import ast
 import xmltodict
 
@@ -51,7 +53,6 @@ def costStr(resp, model):
 
 def summarize(vidID):
     #init
-    openai.api_key = apiKeys.openaiPriv
     ret = ''
 
     #init youtube transcriber
@@ -130,22 +131,20 @@ def summarize(vidID):
             # systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.tgBulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format in the voice of the original author. "
             #system message #2
             systemMessage = f"You are an Analyst for a corporate intelligence group. You generate concise bullet points (no more than {cfg.tgBulletPointNum} bullet points) of input information for the company to later aggregate and analyze. You don't perform any analysis on the input content. You merely summarize it in bullet point format with the same intent as the original author. \n\n Example output:\n-First bullet point summarizing first bit of information\n-Second bullet point summarizing the second bit of information\n-Third bullet point summarizing the third bit of information\netc..."
-            compResp = openai.ChatCompletion.create(
-                model=model, 
-                temperature=0, 
-                max_tokens=int(cfg.tgBulletPointNum*cfg.tgTokensPerbp), 
-                top_p=1,
-                messages=[
-                    {"role": "system", "content": systemMessage},
-                    {"role": "user", "content": job} 
-                ] 
-            )
+            compResp = client.chat.completions.create(model=model, 
+            temperature=0, 
+            max_tokens=int(cfg.tgBulletPointNum*cfg.tgTokensPerbp), 
+            top_p=1,
+            messages=[
+                {"role": "system", "content": systemMessage},
+                {"role": "user", "content": job} 
+            ])
             # dt.info(compResp, 'compResp')
             cost = costStr(compResp, model)
-            ret += f'\nResponse {i+1} from {compResp["model"]}:\t\t' + cost + '\n'
+            ret += f'\nResponse {i+1} from {compResp.model}:\t\t' + cost + '\n'
             checkFinish(compResp)
 
-            cont = compResp['choices'][0]['message']['content']
+            cont = compResp.choices[0].message.content
             ret += f'{cont}\n'
 
             i += 1
